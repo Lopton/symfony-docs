@@ -245,7 +245,7 @@ This option can be used in 3 ways: ``--yell``, ``yell=louder``, and not passing
 the option at all. However, it's hard to distinguish between passing the option
 without a value (``greet --yell``) and not passing the option (``greet``).
 
-To solve this issue, you have to set the option's default value to ``false``::
+To solve this issue, you have to set the option's default value to ``false``.::
 
     // ...
     use Symfony\Component\Console\Input\InputOption;
@@ -260,10 +260,29 @@ To solve this issue, you have to set the option's default value to ``false``::
             false // this is the new default value, instead of null
         );
 
-Now check the value of the option and keep in mind that ``false !== null``::
+The input will now return the default value for the option when it is not specified,
+a null value when it is specified but not explicitly defined  (``greet --yell``), 
+and the defined value when defined  (``greet --yell=lounder``)
+
+To check the value of the option and keep in mind that ``false !== null``::
 
     $optionValue = $input->getOption('yell');
-    $yell = ($optionValue !== false);
-    $yellLouder = ($optionValue === 'louder');
+    if ($optionValue === false ) {
+        // option was not specified
+        $yell = false;
+        $yellLouder = false;        
+    } elseif ($optionValue === null) {
+        // option was specified but no value given
+        $yell = true;
+        $yellLouder = false;        
+    } else {
+        // option was specified with a value which is now stored in $optionValue
+        $yell = true;
+        if ($optionValue === 'louder') {
+            $yellLouder = true;        
+        } else {
+            $yellLouder = false;        
+        }
+    }
 
 .. _`docopt standard`: http://docopt.org/
